@@ -4,7 +4,9 @@ public class BaseTransition<E, S, C> implements Transition<E, S, C> {
 
     private S source;
     private S destination;
-    private Action<C> action;
+    private Action<C> action = c -> {
+	    System.out.printf("transition: %s -> %s\n", getSource(), getDestination());
+    };
     private E trigger;
 
     public BaseTransition() {

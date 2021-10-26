@@ -2,13 +2,13 @@
 transitions:
   - source: state_1
     destination: state_2
-    trigger: event_1
+    trigger: event1
+    action: com.fdgfdgfdgdgdf.uadsada.Action1
   - source: state_2
     destination: state_3
-    trigger: event_2
+    trigger: event2
+    action: com.fdgfdgfdgdgdf.uadsada.Action2
   - source: state_3
     destination: state_4
-    trigger: event_3
-  - source: state_4
-    destination: state_1
-    trigger: event_4
+    trigger: event3
+    action: com.fdgfdgfdgdgdf.uadsada.Action3
