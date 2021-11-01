@@ -1,0 +1,12 @@
+fsms:
+ - name: MAIN
+   states:
+   - name: DEVICE_INIT
+     entryAction: SomeClassSomeActionMethod
+     exitAction: SomeClassSomeActionMethod
+     transitions:
+      - event: EV_READY_FOR_CONNECT
+        nextState: DEVICE_CONNECTING
+        predicate: PredicateLambda
+        action: SomeClassSomeActionMethod
+
