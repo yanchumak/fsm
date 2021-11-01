@@ -21,14 +21,7 @@ public class Main {
 				.addTransition(Transition.<MyEvent, MyContext>builder()
 						.withEvent("EVENT_1")
 						.withNextState("STATE_2")
-						.withAction((e, c) -> {
-							try {
-								Thread.sleep(100);
-							} catch(InterruptedException ex) {
-								ex.printStackTrace();
-							}
-							System.out.println("Action INIT -> STATE_2");
-						}).build())
+						.withAction((e, c) -> System.out.println("Action INIT -> STATE_2")).build())
 				.withEntryAction((e, c) -> System.out.println("Entry INIT"))
 				.withExitAction((e, c) -> System.out.println("Exit INIT"))
 				.build());
@@ -36,18 +29,17 @@ public class Main {
 		states.add(State.<MyEvent, MyContext>builder()
 				.withName("STATE_2")
 				.addTransition(Transition.<MyEvent, MyContext>builder()
-						.withEvent("EVENT_2")
-						.withNextState("STATE_2")
-						.withAction((e, c) -> {
-							try {
-								Thread.sleep(100);
-							} catch(InterruptedException ex) {
-								ex.printStackTrace();
-							}
-							System.out.println("Action STATE_2 -> STATE_2");
-						}).build())
+						.withEvent("EVENT_FINAL")
+						.withNextState("STATE_FINAL")
+						.withAction((e, c) -> System.out.println("Action STATE_2 -> STATE_FINAL")).build())
 				.withEntryAction((e, c) -> System.out.println("Entry STATE_2"))
 				.withExitAction((e, c) -> System.out.println("Exit STATE_2"))
+				.build());
+
+		states.add(State.<MyEvent, MyContext>builder()
+				.withName("STATE_FINAL")
+				.withEntryAction((e, c) -> System.out.println("Entry STATE_FINAL"))
+				.withExitAction((e, c) -> System.out.println("Exit STATE_FINAL"))
 				.build());
 
 		FiniteStateMachine<MyEvent, MyContext> main = FiniteStateMachine.<MyEvent, MyContext>builder()
@@ -58,7 +50,7 @@ public class Main {
 		try {
 			MyContext context = new MyContext("context", new HashMap<>());
 			main.fire(new MyEvent("EVENT_1", "data1"), context);
-			main.fire(new MyEvent("EVENT_2", "data1"), context);
+			main.fire(new MyEvent("EVENT_FINAL", "data2"), context);
 			System.out.println(context.currentStates());
 		} catch(FiniteStateMachineException e) {
 			e.printStackTrace();
