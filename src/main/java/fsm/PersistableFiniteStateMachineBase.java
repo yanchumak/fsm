@@ -1,26 +1,23 @@
 package fsm;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import fsm.context.Context;
-import fsm.context.ContextRepository;
-import fsm.context.ContextRepositoryException;
 import fsm.state.State;
 
 public class PersistableFiniteStateMachineBase<E extends Event, C extends Context>
-		extends FiniteStateMachineBase<E, C> implements PersistableFiniteStateMachine<E, C> {
+		extends FiniteStateMachineImpl<E, C> implements PersistableFiniteStateMachine<E, C> {
 
-	public PersistableFiniteStateMachineBase(String name, Collection<State<E, C>> states, String initState) {
+	public PersistableFiniteStateMachineBase(String name, List<State<E, C>> states, String initState) {
 		super(name, states, initState);
 	}
 
 	@Override
-	public C fire(E event, ContextRepository<C> contextRepository)
-			throws FiniteStateMachineFireException, ContextRepositoryException {
-		C context = contextRepository.find()
-				.orElseThrow(() -> new FiniteStateMachineFireException("Can't find context, event " + event.name()));
-		context = fire(event, context);
-		contextRepository.save(context);
-		return context;
+	public final void fire(E event, Supplier<C> contextReader, Consumer<C> contextWriter) throws FiniteStateMachineException {
+		C context = contextReader.get();
+		fire(event, context);
+		contextWriter.accept(context);
 	}
 }

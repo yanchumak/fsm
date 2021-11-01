@@ -15,21 +15,19 @@ import fsm.context.Context;
 public interface Action<E extends Event, C extends Context> {
 
 	/**
-	 * Action that will be performed on
+	 * Action that can be performed on
 	 *      {@link fsm.state.State#entryAction()}
 	 *      {@link fsm.state.State#exitAction()}
 	 *      {@link fsm.state.Transition#action()}
 	 *
 	 * @param context of {@link FiniteStateMachine}
-	 *
-	 * @return context of {@link FiniteStateMachine}
 	 */
-	C perform(E event, C context);
+	void perform(E event, C context);
 
 	/**
 	 * Action that does absolutely nothing.
 	 */
 	static <E extends Event, C extends Context> Action<E, C> noAction() {
-		return (e, c) -> c;
+		return (e, c) -> {};
 	}
 }

@@ -1,6 +1,7 @@
 package fsm.state;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import fsm.Event;
 import fsm.FiniteStateMachine;
@@ -33,57 +34,45 @@ public interface Transition<E extends Event, C extends Context> {
 	 *
 	 * @return context of {@link FiniteStateMachine}
 	 */
-	default Action<E, C> action() {
-		return Action.noAction();
-	}
+	Action<E, C> action();
 
 	/**
 	 * This method returns condition based on which state will be transitioned.
 	 *
 	 * @return instance of {@link Condition}.
 	 */
-	default Condition<C> condition() {
-		return Condition.noCondition();
-	}
-
+	Condition<C> condition();
 
 	class Builder<E extends Event, C extends Context> {
-		private final TransitionImpl<E, C> transition = new TransitionImpl<>();
+		private String event;
+		private String nextState;
+		private Action<E, C> action = Action.noAction();
+		private Condition<C> condition = Condition.noCondition();
 
-		public Transition.Builder<E, C> withEvent(String event) {
-			if(event == null || event.isEmpty()) {
-				throw new IllegalArgumentException("event can't be null or empty");
-			}
-			transition.event = event;
+		public Builder<E, C> withEvent(String event) {
+			this.event = event;
 			return this;
 		}
 
-		public Transition.Builder<E, C> withNextState(String nextState) {
-			if(nextState == null || nextState.isEmpty()) {
-				throw new IllegalArgumentException("nextState can't be null or empty");
-			}
-			transition.nextState = nextState;
+		public Builder<E, C> withNextState(String nextState) {
+			this.nextState = nextState;
 			return this;
 		}
 
-		public Transition.Builder<E, C> withAction(Action<E, C> action) {
-			transition.action = Objects.requireNonNull(action, "action can't be null");
+		public Builder<E, C> withAction(Action<E, C> action) {
+			this.action = Objects.requireNonNull(action, "action can't be null");
 			return this;
 		}
 
-		public Transition.Builder<E, C> withCondition(Condition<C> condition) {
-			transition.condition = Objects.requireNonNull(condition, "condition can't be null");
+		public Builder<E, C> withCondition(Condition<C> condition) {
+			this.condition = Objects.requireNonNull(condition, "condition can't be null");
 			return this;
 		}
 
 		public Transition<E, C> build() {
-			if(transition.event == null || transition.event.isEmpty()) {
-				throw new IllegalArgumentException("event can't be null or empty");
-			}
-			if(transition.nextState == null || transition.nextState.isEmpty()) {
-				throw new IllegalArgumentException("nextState can't be null or empty");
-			}
-			return transition;
+			Objects.requireNonNull(event, "event can't be null");
+			Objects.requireNonNull(nextState, "nextState can't be null");
+			return new TransitionImpl<>(event, nextState, action, condition);
 		}
 	}
 

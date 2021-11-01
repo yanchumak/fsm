@@ -1,12 +1,13 @@
 package example;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import fsm.Event;
-import fsm.FiniteStateMachineBase;
-import fsm.FiniteStateMachineFireException;
+import fsm.FiniteStateMachine;
+import fsm.FiniteStateMachineException;
 import fsm.context.Context;
 import fsm.context.CurrentState;
 import fsm.state.State;
@@ -26,16 +27,11 @@ public class Main {
 							} catch(InterruptedException ex) {
 								ex.printStackTrace();
 							}
-							System.out.println("action EVENT 1");
-							return c;
+							System.out.println("Action INIT -> STATE_2");
 						}).build())
-				.withEntryAction((e, c) -> {
-					System.out.println("Entry action INIT");
-					return c;
-				}).withExitAction((e, c) -> {
-					System.out.println("Exit action INIT");
-					return c;
-				}).build());
+				.withEntryAction((e, c) -> System.out.println("Entry INIT"))
+				.withExitAction((e, c) -> System.out.println("Exit INIT"))
+				.build());
 
 		states.add(State.<MyEvent, MyContext>builder()
 				.withName("STATE_2")
@@ -48,45 +44,46 @@ public class Main {
 							} catch(InterruptedException ex) {
 								ex.printStackTrace();
 							}
-							System.out.println("action EVENT 2");
-							return c;
+							System.out.println("Action STATE_2 -> STATE_2");
 						}).build())
-				.withEntryAction((e, c) -> {
-					System.out.println("Entry action STATE_2");
-					return c;
-				}).withExitAction((e, c) -> {
-					System.out.println("Exit action STATE_2");
-					return c;
-				}).build());
-		FiniteStateMachineBase<MyEvent, MyContext> main = new FiniteStateMachineBase<>("MAIN", states, "INIT");
+				.withEntryAction((e, c) -> System.out.println("Entry STATE_2"))
+				.withExitAction((e, c) -> System.out.println("Exit STATE_2"))
+				.build());
+
+		FiniteStateMachine<MyEvent, MyContext> main = FiniteStateMachine.<MyEvent, MyContext>builder()
+				.withName("MAIN")
+				.withInitState("INIT")
+				.withStates(states).build();
 
 		try {
-			MyContext c = main.fire(new MyEvent("EVENT_1", "data1"),
-					new MyContext("context", new ArrayList<>()));
-
-			c = main.fire(new MyEvent("EVENT_2", "data1"), c);
-			System.out.println(c);
-		} catch(FiniteStateMachineFireException e) {
+			MyContext context = new MyContext("context", new HashMap<>());
+			main.fire(new MyEvent("EVENT_1", "data1"), context);
+			main.fire(new MyEvent("EVENT_2", "data1"), context);
+			System.out.println(context.currentStates());
+		} catch(FiniteStateMachineException e) {
 			e.printStackTrace();
 		}
 
 	}
 
-
 	static class MyContext implements Context {
 		final String data;
-		final List<CurrentState> currentStates;
+		final Map<String, CurrentState> currentStates;
 
-		MyContext(String data, List<CurrentState> currentStates) {
+		MyContext(String data, Map<String, CurrentState> currentStates) {
 			this.data = data;
 			this.currentStates = currentStates;
 		}
 
 		@Override
-		public List<CurrentState> currentStates() {
-			return currentStates;
+		public Map<String, CurrentState> currentStates() {
+			return new HashMap<>(currentStates);
 		}
 
+		@Override
+		public void updateCurrentState(String finiteStateMachineName, CurrentState currentState) {
+			currentStates.put(finiteStateMachineName, currentState);
+		}
 	}
 
 	static class MyEvent implements Event {

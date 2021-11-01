@@ -1,15 +1,14 @@
 package fsm.context;
 
+import java.util.HashMap;
 import java.util.Map;
 
-class CurrentStateImpl implements CurrentState {
+final class CurrentStateImpl implements CurrentState {
 	private final String name;
-	private final String finiteStateMachine;
 	private final Map<String, String> values;
 
-	CurrentStateImpl(String name, String finiteStateMachine, Map<String, String> values) {
+	CurrentStateImpl(String name, Map<String, String> values) {
 		this.name = name;
-		this.finiteStateMachine = finiteStateMachine;
 		this.values = values;
 	}
 
@@ -19,12 +18,20 @@ class CurrentStateImpl implements CurrentState {
 	}
 
 	@Override
-	public String finiteStateMachine() {
-		return finiteStateMachine;
+	public Map<String, String> values() {
+		return new HashMap<>(values);
 	}
 
 	@Override
-	public Map<String, String> values() {
-		return values;
+	public void updateValue(String key, String value) {
+		this.values.put(key, value);
+	}
+
+	@Override
+	public String toString() {
+		return "{" +
+				"name='" + name + '\'' +
+				", values=" + values +
+				'}';
 	}
 }

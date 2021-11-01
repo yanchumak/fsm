@@ -1,5 +1,6 @@
 package fsm.state;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,18 +28,14 @@ public interface State<E extends Event, C extends Context> {
 	 *
 	 * @return context of {@link FiniteStateMachine}
 	 */
-	default Action<E, C> entryAction() {
-		return Action.noAction();
-	}
+	Action<E, C> entryAction();
 
 	/**
 	 * Action that will be performed when exiting the state.
 	 *
 	 * @return context of {@link FiniteStateMachine}
 	 */
-	default Action<E, C> exitAction() {
-		return Action.noAction();
-	}
+	Action<E, C> exitAction();
 
 	/**
 	 * List of state transitions which allowed for the current state.
@@ -48,39 +45,42 @@ public interface State<E extends Event, C extends Context> {
 	List<Transition<E, C>> transitions();
 
 	class Builder<E extends Event, C extends Context> {
-		private final StateImpl<E, C> state = new StateImpl<>();
+		private String name;
+		private List<Transition<E, C>> transitions = new ArrayList<>();
+		private Action<E, C> entryAction = Action.noAction();
+		private Action<E, C> exitAction = Action.noAction();
 
 		public Builder<E, C> withName(String name) {
-			if(name == null || name.isEmpty()) {
-				throw new IllegalArgumentException("name can't be null or empty");
-			}
-			state.name = name;
+			this.name = name;
 			return this;
 		}
 
 		public Builder<E, C> addTransition(Transition<E, C> transition) {
-			state.transitions.add(Objects.requireNonNull(transition, "transition can't be null"));
+			this.transitions.add(Objects.requireNonNull(transition, "transition can't be null"));
 			return this;
 		}
 
 		public Builder<E, C> withEntryAction(Action<E, C> entryAction) {
-			state.entryAction = Objects.requireNonNull(entryAction, "entry action can't be null");
+			this.entryAction = entryAction;
+			return this;
+		}
+
+		public Builder<E, C> withTransitions(List<Transition<E, C>> transitions) {
+			this.transitions = Objects.requireNonNull(transitions, "transitions can't be null");
+
 			return this;
 		}
 
 		public Builder<E, C> withExitAction(Action<E, C> exitAction) {
-			state.exitAction = Objects.requireNonNull(exitAction, "exit action can't be null");
+			this.exitAction = exitAction;
 			return this;
 		}
 
 		public State<E, C> build() {
-			if(state.name == null || state.name.isEmpty()) {
-				throw new IllegalArgumentException("name can't be null or empty");
-			}
-			if(state.transitions == null || state.transitions.isEmpty()) {
-				throw new IllegalArgumentException("transitions can't be null or empty");
-			}
-			return state;
+			Objects.requireNonNull(name, "name can't be null");
+			Objects.requireNonNull(entryAction, "entry action can't be null");
+			Objects.requireNonNull(exitAction, "exit action can't be null");
+			return new StateImpl<>(name, transitions, entryAction, exitAction);
 		}
 	}
 
