@@ -1,7 +1,8 @@
 package fsm;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -10,17 +11,13 @@ import fsm.context.CurrentState;
 import fsm.state.State;
 import fsm.state.Transition;
 
-class FiniteStateMachineImpl<E extends Event, C extends Context> implements FiniteStateMachine<E, C> {
+final class FiniteStateMachineImpl<E extends Event, C extends Context> implements FiniteStateMachine<E, C> {
 
-	private final String name;
-	private final List<State<E, C>> states;
-	private final String initState;
-
-	FiniteStateMachineImpl(String name, List<State<E, C>> states, String initState) {
-		this.name = name;
-		this.states = states;
-		this.initState = initState;
-	}
+	String name;
+	FiniteStateMachine<E, C> parent;
+	Map<String, FiniteStateMachine<E, C>> children;
+	List<State<E, C>> states;
+	String initState;
 
 	@Override
 	public String initState() {
@@ -34,16 +31,36 @@ class FiniteStateMachineImpl<E extends Event, C extends Context> implements Fini
 
 	@Override
 	public List<State<E, C>> states() {
-		return states;
+		return new ArrayList<>(states);
 	}
 
 	@Override
-	public final void fire(E event, C context) throws FiniteStateMachineException {
+	public Optional<FiniteStateMachine<E, C>> parent() {
+		return Optional.ofNullable(parent);
+	}
+
+	@Override
+	public List<FiniteStateMachine<E, C>> children() {
+		return new ArrayList<>(children.values());
+	}
+
+	@Override
+	public Optional<FiniteStateMachine<E, C>> childWithName(String finiteStateMachineName) {
+		return Optional.ofNullable(children.get(finiteStateMachineName));
+	}
+
+	@Override
+	public void addChild(FiniteStateMachine<E, C> child) {
+		children.put(child.name(), child);
+	}
+
+	@Override
+	public void fire(E event, C context) throws FiniteStateMachineException {
 		CurrentState currentStateContext = getCurrentStateAndUpdateContext(context);
 
 		State<E,C> currentState = getStateOrThrow(currentStateContext.name());
 		try {
-			currentState.exitAction().perform(event, context);
+			currentState.exitAction().perform(event, context, this);
 		} catch(Exception e) {
 			throw new FiniteStateMachineException(
 					String.format("[%s] Can't perform exit action, state '%s', event '%s'", name(), currentState.name(), event.name()), e);
@@ -54,14 +71,14 @@ class FiniteStateMachineImpl<E extends Event, C extends Context> implements Fini
 			State<E, C> nextState = getStateOrThrow(transition.get().nextState());
 
 			try {
-				transition.get().action().perform(event, context);
+				transition.get().action().perform(event, context, this);
 			} catch(Exception e) {
 				throw new FiniteStateMachineException(
 						String.format("[%s] Can't perform action, state '%s', event '%s'", name(), nextState.name(), event.name()), e);
 			}
 
 			try {
-				nextState.entryAction().perform(event, context);
+				nextState.entryAction().perform(event, context, this);
 			} catch(Exception e) {
 				throw new FiniteStateMachineException(
 						String.format("[%s] Can't perform entry action, state '%s', event '%s'", name(), nextState.name(), event.name()), e);
@@ -90,11 +107,11 @@ class FiniteStateMachineImpl<E extends Event, C extends Context> implements Fini
 	}
 
 	private State<E, C> getStateOrThrow(String state) throws FiniteStateMachineException {
-		List<State<E, C>> states = states().stream()
+		List<State<E, C>> filteredStates = states.stream()
 				.filter(s -> s.name().equals(state))
 				.collect(Collectors.toList());
-		if(states.size() == 1) {
-			return states.get(0);
+		if(filteredStates.size() == 1) {
+			return filteredStates.get(0);
 		}
 		throw new FiniteStateMachineException(
 				String.format("[%s] Expected 1 state with name '%s', but found %d", name(), state, states.size()));

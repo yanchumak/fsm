@@ -22,4 +22,6 @@ public interface Context {
 	 * @param currentState updated {@link CurrentState} object.
 	 */
 	void updateCurrentState(String finiteStateMachineName, CurrentState currentState);
+
+	//TODO remove/update/get ?
 }

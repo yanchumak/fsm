@@ -16,6 +16,7 @@ public interface CurrentState {
 	 */
 	String name();
 
+	//TODO update/remove/get value?
 	/**
 	 * The method returns copy of finite state machine values.
 	 *

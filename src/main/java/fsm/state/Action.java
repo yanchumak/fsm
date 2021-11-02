@@ -22,12 +22,12 @@ public interface Action<E extends Event, C extends Context> {
 	 *
 	 * @param context of {@link FiniteStateMachine}
 	 */
-	void perform(E event, C context);
+	void perform(E event, C context, FiniteStateMachine<E, C> self);
 
 	/**
 	 * Action that does absolutely nothing.
 	 */
 	static <E extends Event, C extends Context> Action<E, C> noAction() {
-		return (e, c) -> {};
+		return (e, c, f) -> {};
 	}
 }

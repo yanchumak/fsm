@@ -1,6 +1,8 @@
 package fsm.registry;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,5 +28,10 @@ final class FiniteStateMachineRegistryImpl<E extends Event, C extends Context> i
 	@Override
 	public Optional<FiniteStateMachine<E, C>> findByName(String name) {
 		return Optional.ofNullable(nameToFsm.get(name));
+	}
+
+	@Override
+	public List<FiniteStateMachine<E, C>> findAll() {
+		return new ArrayList<>(nameToFsm.values());
 	}
 }
