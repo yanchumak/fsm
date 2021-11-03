@@ -14,7 +14,7 @@ import fsm.context.Context;
 public interface PersistableFiniteStateMachine<E extends Event, C extends Context> extends FiniteStateMachine<E, C> {
 
 	/**
-	 * Fires the specified event. This is how states are transitioned.
+	 * Handles the specified event. This is how states are transitioned.
 	 *
 	 * @param event the event fired.
 	 * @param contextReader function that reads {@link Context} from database, cache, etc.
@@ -22,6 +22,6 @@ public interface PersistableFiniteStateMachine<E extends Event, C extends Contex
 	 *
 	 * @throws FiniteStateMachineException
 	 */
-	void fire(E event, Supplier<C> contextReader, Consumer<C> contextWriter) throws FiniteStateMachineException;
+	void handle(E event, Supplier<C> contextReader, Consumer<C> contextWriter) throws FiniteStateMachineException;
 }
 

@@ -55,7 +55,7 @@ final class FiniteStateMachineImpl<E extends Event, C extends Context> implement
 	}
 
 	@Override
-	public void fire(E event, C context) throws FiniteStateMachineException {
+	public void handle(E event, C context) throws FiniteStateMachineException {
 		CurrentState currentStateContext = getCurrentStateAndUpdateContext(context);
 
 		State<E,C> currentState = getStateOrThrow(currentStateContext.name());

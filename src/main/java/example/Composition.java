@@ -94,8 +94,8 @@ public class Composition {
 		MyEvent myEvent1 = new MyEvent("MAIN_EVENT_1", "MAIN_EVENT_1 data");
 		MyEvent myEvent2 = new MyEvent("CHILD_EVENT_FINAL", "CHILD_EVENT_FINAL data");
 
-		registry.findByEvent(myEvent1.name()).get().fire(myEvent1, myContext);
-		registry.findByEvent(myEvent2.name()).get().fire(myEvent2, myContext);
+		registry.findByEvent(myEvent1.name()).get().handle(myEvent1, myContext);
+		registry.findByEvent(myEvent2.name()).get().handle(myEvent2, myContext);
 		System.out.println(myContext);
 	}
 
@@ -104,7 +104,7 @@ public class Composition {
 		System.out.println("Entry MAIN_STATE_2");
 		myContext.currentStates().get(self.name()).updateValue("startChild", "true");
 		try {
-			child.fire(new MyEvent("CHILD_EVENT_1", myEvent.data), myContext);
+			child.handle(new MyEvent("CHILD_EVENT_1", myEvent.data), myContext);
 		} catch(FiniteStateMachineException e) {
 			e.printStackTrace();
 		}
@@ -114,7 +114,7 @@ public class Composition {
 		System.out.println("   Entry CHILD_STATE_FINAL");
 		FiniteStateMachine<MyEvent, MyContext> parent = self.parent().get();
 		try {
-			parent.fire(new MyEvent("MAIN_EVENT_FINAL", myEvent.data), myContext);
+			parent.handle(new MyEvent("MAIN_EVENT_FINAL", myEvent.data), myContext);
 		} catch(FiniteStateMachineException e) {
 			e.printStackTrace();
 		}

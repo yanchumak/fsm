@@ -20,10 +20,10 @@ public class PersistableFiniteStateMachineBase<E extends Event, C extends Contex
 	}
 
 	@Override
-	public final void fire(E event, Supplier<C> contextReader, Consumer<C> contextWriter) throws FiniteStateMachineException {
+	public final void handle(E event, Supplier<C> contextReader, Consumer<C> contextWriter) throws FiniteStateMachineException {
 		//TODO add handling optimistic lock
 		C context = contextReader.get();
-		fire(event, context);
+		handle(event, context);
 		contextWriter.accept(context);
 	}
 
@@ -63,7 +63,7 @@ public class PersistableFiniteStateMachineBase<E extends Event, C extends Contex
 	}
 
 	@Override
-	public void fire(E event, C context) throws FiniteStateMachineException {
-		delegate.fire(event, context);
+	public void handle(E event, C context) throws FiniteStateMachineException {
+		delegate.handle(event, context);
 	}
 }

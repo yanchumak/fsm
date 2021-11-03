@@ -70,14 +70,14 @@ public interface FiniteStateMachine<E extends Event, C extends Context> {
 	void addChild(FiniteStateMachine<E, C> child);
 
 	/**
-	 * Fires the specified event. This is how states are transitioned.
+	 * Handles the specified event. This is how states are transitioned.
 	 *
 	 * @param event the event fired.
 	 * @param context the context of the current state machine.
 	 *
 	 * @throws FiniteStateMachineException
 	 */
-	void fire(E event, C context) throws FiniteStateMachineException;
+	void handle(E event, C context) throws FiniteStateMachineException;
 
 	static <E extends Event, C extends Context> Builder<E, C> builder() {
 		return new Builder<>();

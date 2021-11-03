@@ -45,8 +45,8 @@ public class SimpleOne {
 
 		try {
 			MyContext context = new MyContext("context", new HashMap<>());
-			main.fire(new MyEvent("EVENT_1", "data1"), context);
-			main.fire(new MyEvent("EVENT_FINAL", "data2"), context);
+			main.handle(new MyEvent("EVENT_1", "data1"), context);
+			main.handle(new MyEvent("EVENT_FINAL", "data2"), context);
 			System.out.println(context.currentStates());
 		} catch(FiniteStateMachineException e) {
 			e.printStackTrace();
