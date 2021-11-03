@@ -1,0 +1,11 @@
+fsms:
+  - name: MAIN
+    states:
+      - name: INIT
+        entryAction: SomeClassSomeActionMethod #optional
+        exitAction: SomeClassSomeActionMethod #optional
+        transitions:
+          - event: EV_SOME_EVENT
+            nextState: SOME_NEXT_STATE
+            predicate: PredicateLambda #optional
+            action: SomeClassSomeActionMethod #optional
