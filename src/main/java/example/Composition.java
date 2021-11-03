@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import fsm.FiniteStateMachine;
 import fsm.FiniteStateMachineException;
-import fsm.registry.FiniteStateMachineRegistry;
+import fsm.FiniteStateMachineRegistry;
 import fsm.state.State;
 import fsm.state.Transition;
 
@@ -21,6 +21,7 @@ import fsm.state.Transition;
 	Exit MAIN_STATE_2
 	Transition action MAIN_STATE_2 -> MAIN_STATE_FINAL
 	Entry MAIN_STATE_FINAL
+	MyContext{data='my context data', currentStates={MAIN={name='MAIN_STATE_FINAL', values={startChild=true}}, CHILD={name='CHILD_STATE_FINAL', values={}}}}
  */
 public class Composition {
 	public static void main(String[] args) throws FiniteStateMachineException {
@@ -84,8 +85,8 @@ public class Composition {
 
 		main.addChild(child);
 
-		FiniteStateMachineRegistry<MyEvent, MyContext> registry =
-				FiniteStateMachineRegistry.<MyEvent, MyContext>builder()
+		FiniteStateMachineRegistry<FiniteStateMachine<MyEvent, MyContext>> registry =
+				FiniteStateMachineRegistry.<FiniteStateMachine<MyEvent, MyContext>>builder()
 						.add(main)
 						.add(child).build();
 
@@ -95,11 +96,13 @@ public class Composition {
 
 		registry.findByEvent(myEvent1.name()).get().fire(myEvent1, myContext);
 		registry.findByEvent(myEvent2.name()).get().fire(myEvent2, myContext);
+		System.out.println(myContext);
 	}
 
 	private static void startChild(MyEvent myEvent, MyContext myContext, FiniteStateMachine<MyEvent, MyContext> self) {
 		FiniteStateMachine<MyEvent, MyContext> child = self.childWithName("CHILD").get();
 		System.out.println("Entry MAIN_STATE_2");
+		myContext.currentStates().get(self.name()).updateValue("startChild", "true");
 		try {
 			child.fire(new MyEvent("CHILD_EVENT_1", myEvent.data), myContext);
 		} catch(FiniteStateMachineException e) {
