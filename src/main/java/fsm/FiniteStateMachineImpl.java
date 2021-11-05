@@ -51,6 +51,10 @@ final class FiniteStateMachineImpl<E extends Event, C extends Context> implement
 
 	@Override
 	public void addChild(FiniteStateMachine<E, C> child) {
+		if(children.containsKey(child.name())) {
+			throw new IllegalArgumentException(
+					String.format("Child finite state machine with name %s is already added", child.name()));
+		}
 		children.put(child.name(), child);
 	}
 

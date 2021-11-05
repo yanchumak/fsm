@@ -66,8 +66,9 @@ public interface FiniteStateMachine<E extends Event, C extends Context> {
 	 * The method adds child to the finite state machine.
 	 *
 	 * @param child {@link FiniteStateMachine}.
+	 * @throws IllegalArgumentException in case of adding the same child more than one time.
 	 */
-	void addChild(FiniteStateMachine<E, C> child);
+	void addChild(FiniteStateMachine<E, C> child) throws IllegalArgumentException;
 
 	/**
 	 * Handles the specified event. This is how states are transitioned.
